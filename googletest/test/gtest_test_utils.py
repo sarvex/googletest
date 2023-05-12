@@ -91,7 +91,7 @@ def _ParseAndStripGTestFlags(argv):
     # The command line flag overrides the environment variable.
     i = 1  # Skips the program name.
     while i < len(argv):
-      prefix = '--' + flag + '='
+      prefix = f'--{flag}='
       if argv[i].startswith(prefix):
         _flag_map[flag] = argv[i][len(prefix) :]
         del argv[i]
@@ -188,10 +188,7 @@ def GetExitStatus(exit_code):
   else:
     # On Unix, os.WEXITSTATUS() must be used to extract the exit status
     # from the result of os.system().
-    if os.WIFEXITED(exit_code):
-      return os.WEXITSTATUS(exit_code)
-    else:
-      return -1
+    return os.WEXITSTATUS(exit_code) if os.WIFEXITED(exit_code) else -1
 
 
 class Subprocess:
@@ -220,11 +217,7 @@ class Subprocess:
                                combined in a string.
     """
 
-    if capture_stderr:
-      stderr = subprocess.STDOUT
-    else:
-      stderr = subprocess.PIPE
-
+    stderr = subprocess.STDOUT if capture_stderr else subprocess.PIPE
     p = subprocess.Popen(
         command,
         stdout=subprocess.PIPE,

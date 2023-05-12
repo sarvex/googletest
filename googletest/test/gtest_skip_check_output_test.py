@@ -50,7 +50,7 @@ class SkipEntireEnvironmentTest(gtest_test_utils.TestCase):
     self.assertIn('Skipped\nskipping single test\n', OUTPUT)
     skip_fixture = 'Skipped\nskipping all tests for this fixture\n'
     self.assertIsNotNone(
-        re.search(skip_fixture + '.*' + skip_fixture, OUTPUT, flags=re.DOTALL),
+        re.search(f'{skip_fixture}.*{skip_fixture}', OUTPUT, flags=re.DOTALL),
         repr(OUTPUT),
     )
     self.assertNotIn('FAILED', OUTPUT)

@@ -89,19 +89,12 @@ class GTestXMLTestCase(gtest_test_utils.TestCase):
       actual_attr = actual_attributes.get(expected_attr.name)
       self.assertTrue(
           actual_attr is not None,
-          'expected attribute %s not found in element %s'
-          % (expected_attr.name, actual_node.tagName),
+          f'expected attribute {expected_attr.name} not found in element {actual_node.tagName}',
       )
       self.assertEqual(
           expected_attr.value,
           actual_attr.value,
-          ' values of attribute %s in element %s differ: %s vs %s'
-          % (
-              expected_attr.name,
-              actual_node.tagName,
-              expected_attr.value,
-              actual_attr.value,
-          ),
+          f' values of attribute {expected_attr.name} in element {actual_node.tagName} differ: {expected_attr.value} vs {actual_attr.value}',
       )
 
     expected_children = self._GetChildren(expected_node)
@@ -109,13 +102,12 @@ class GTestXMLTestCase(gtest_test_utils.TestCase):
     self.assertEqual(
         len(expected_children),
         len(actual_children),
-        'number of child elements differ in element ' + actual_node.tagName,
+        f'number of child elements differ in element {actual_node.tagName}',
     )
     for child_id, child in expected_children.items():
       self.assertTrue(
           child_id in actual_children,
-          '<%s> is not in <%s> (in element %s)'
-          % (child_id, actual_children, actual_node.tagName),
+          f'<{child_id}> is not in <{actual_children}> (in element {actual_node.tagName})',
       )
       self.AssertEquivalentNodes(child, actual_children[child_id])
 
@@ -161,7 +153,7 @@ class GTestXMLTestCase(gtest_test_utils.TestCase):
         else:
           self.assertTrue(
               child.tagName in self.identifying_attribute,
-              'Encountered unknown element <%s>' % child.tagName,
+              f'Encountered unknown element <{child.tagName}>',
           )
           child_id = child.getAttribute(
               self.identifying_attribute[child.tagName]
@@ -169,16 +161,15 @@ class GTestXMLTestCase(gtest_test_utils.TestCase):
         self.assertNotIn(child_id, children)
         children[child_id] = child
       elif child.nodeType in [Node.TEXT_NODE, Node.CDATA_SECTION_NODE]:
-        if 'detail' not in children:
-          if (
+        if 'detail' in children:
+          children['detail'].nodeValue += child.nodeValue
+        elif (
               child.nodeType == Node.CDATA_SECTION_NODE
               or not child.nodeValue.isspace()
           ):
-            children['detail'] = child.ownerDocument.createCDATASection(
-                child.nodeValue
-            )
-        else:
-          children['detail'].nodeValue += child.nodeValue
+          children['detail'] = child.ownerDocument.createCDATASection(
+              child.nodeValue
+          )
       else:
         self.fail('Encountered unexpected node type %d' % child.nodeType)
     return children
@@ -208,8 +199,7 @@ class GTestXMLTestCase(gtest_test_utils.TestCase):
     """
 
     if element.tagName == 'testcase':
-      source_file = element.getAttributeNode('file')
-      if source_file:
+      if source_file := element.getAttributeNode('file'):
         source_file.value = re.sub(r'^.*[/\\](.*)', '\\1', source_file.value)
     if element.tagName in ('testsuites', 'testsuite', 'testcase'):
       timestamp = element.getAttributeNode('timestamp')
@@ -224,7 +214,7 @@ class GTestXMLTestCase(gtest_test_utils.TestCase):
       type_param = element.getAttributeNode('type_param')
       if type_param and type_param.value:
         type_param.value = '*'
-    elif element.tagName == 'failure' or element.tagName == 'skipped':
+    elif element.tagName in ['failure', 'skipped']:
       source_line_pat = r'^.*[/\\](.*:)\d+\n'
       # Replaces the source line information with a normalized form.
       message = element.getAttributeNode('message')

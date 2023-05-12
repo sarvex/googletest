@@ -130,11 +130,11 @@ class GTestJsonOutFilesTest(gtest_test_utils.TestCase):
 
   def DeleteFilesAndDir(self):
     try:
-      os.remove(os.path.join(self.output_dir_, GTEST_OUTPUT_1_TEST + '.json'))
+      os.remove(os.path.join(self.output_dir_, f'{GTEST_OUTPUT_1_TEST}.json'))
     except os.error:
       pass
     try:
-      os.remove(os.path.join(self.output_dir_, GTEST_OUTPUT_2_TEST + '.json'))
+      os.remove(os.path.join(self.output_dir_, f'{GTEST_OUTPUT_2_TEST}.json'))
     except os.error:
       pass
     try:
@@ -150,16 +150,16 @@ class GTestJsonOutFilesTest(gtest_test_utils.TestCase):
 
   def _TestOutFile(self, test_name, expected):
     gtest_prog_path = gtest_test_utils.GetTestExecutablePath(test_name)
-    command = [gtest_prog_path, '--gtest_output=json:%s' % self.output_dir_]
+    command = [gtest_prog_path, f'--gtest_output=json:{self.output_dir_}']
     p = gtest_test_utils.Subprocess(
         command, working_dir=gtest_test_utils.GetTempDir()
     )
     self.assertTrue(p.exited)
     self.assertEqual(0, p.exit_code)
 
-    output_file_name1 = test_name + '.json'
+    output_file_name1 = f'{test_name}.json'
     output_file1 = os.path.join(self.output_dir_, output_file_name1)
-    output_file_name2 = 'lt-' + output_file_name1
+    output_file_name2 = f'lt-{output_file_name1}'
     output_file2 = os.path.join(self.output_dir_, output_file_name2)
     self.assertTrue(
         os.path.isfile(output_file1) or os.path.isfile(output_file2),

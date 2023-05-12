@@ -243,16 +243,15 @@ class GTestListTestsOutputUnitTest(gtest_test_utils.TestCase):
     self._TestOutput('json', EXPECTED_JSON)
 
   def _GetOutput(self, out_format):
-    file_path = os.path.join(
-        gtest_test_utils.GetTempDir(), 'test_out.' + out_format
-    )
+    file_path = os.path.join(gtest_test_utils.GetTempDir(),
+                             f'test_out.{out_format}')
     gtest_prog_path = gtest_test_utils.GetTestExecutablePath(
         'gtest_list_output_unittest_'
     )
 
     command = [
         gtest_prog_path,
-        '%s=%s:%s' % (GTEST_OUTPUT_FLAG, out_format, file_path),
+        f'{GTEST_OUTPUT_FLAG}={out_format}:{file_path}',
         '--gtest_list_tests',
     ]
     environ_copy = os.environ.copy()
